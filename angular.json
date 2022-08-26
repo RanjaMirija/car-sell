@@ -125,6 +125,16 @@
             ],
             "scripts": []
           }
+        },
+        "deploy": {
+          "builder": "@angular/fire:deploy",
+          "options": {
+            "prerender": false,
+            "ssr": false,
+            "browserTarget": "car-sell:build:production",
+            "firebaseProject": "car-sell-d4404",
+            "firebaseHostingSite": "car-sell-d4404"
+          }
         }
       }
     }

@@ -1,5 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { observable, Subscription } from 'rxjs';
 import { Offer } from 'src/app/interfaces/offer';
 import { OffersService } from 'src/app/services/offers.service';
 
@@ -8,11 +9,15 @@ import { OffersService } from 'src/app/services/offers.service';
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.scss']
 })
-export class DashboardComponent implements OnInit {
+export class DashboardComponent implements OnInit, OnDestroy {
 
   offerForm!: FormGroup;
 
   offers: Offer[] = [];
+
+  subscription! : Subscription;
+  currentOfferPhotoFile! : any;
+  currentPhotoUrl! : string;
 
   constructor(
     private formBuilder : FormBuilder,
@@ -21,13 +26,21 @@ export class DashboardComponent implements OnInit {
 
   ngOnInit(): void {
     this.initOfferForm();
-    this.offers = this.offersServices.getOffers();
+    this.subscription = this.offersServices.offersSubject.subscribe({
+      next: (offers : Offer[]) => {
+        console.log('NEXT');
+        this.offers = offers;
+      },
+      error: console.error
+    });
+    this.offersServices.getOffers();
   }
 
   initOfferForm(): void {
     this.offerForm = this.formBuilder.group({
-      index: [0],
+      id: [null],
       title:['',[Validators.required, Validators.maxLength(50)]],
+      photo: [],
       brand:'',
       model:'',
       description:'',
@@ -36,25 +49,55 @@ export class DashboardComponent implements OnInit {
   }
 
   onSubmitOfferForm(): void {
-    const offerIndex = this.offerForm.value.index;
+    const offerId = this.offerForm.value.id;
     let offer = this.offerForm.value;
-    if (offerIndex == null || offerIndex == undefined ) {
+    if (!offerId || offerId && offerId === '' ) { //Création
       delete offer.index;
-      this.offers = this.offersServices.createOffer(offer);
-    } else {
-      delete offer.index;
-      this.offers= this.offersServices.editOffer(offer, offerIndex);
+      this.offersServices.createOffer(offer, this.currentOfferPhotoFile)
+     .catch(console.error)
+    } else { // Modification
+      delete offer.id;
+      this.offersServices.editOffer(offer, offerId)
+      .catch(console.error);
     }
     this.offerForm.reset();
-    //console.log(this.offers);
+    this.currentOfferPhotoFile = null;
+    this.currentPhotoUrl = '';
   }
 
-  onEditOffer(offer: Offer, index: number): void{
-    this.offerForm.setValue({...offer, index});
+  onChangeOfferPhoto($event: any ): void {
+    this.currentOfferPhotoFile = $event.target.files[0];
+    const filereader = new FileReader();
+    filereader.readAsDataURL(this.currentOfferPhotoFile);
+    filereader.onloadend = (e) => {
+      this.currentPhotoUrl = <string>e.target?.result
+    }
+
   }
 
-  onDeleteOffer(index: number): void {
-    this.offersServices.deleteOffer(index);
+  onEditOffer(offer: Offer): void{
+    this.offerForm.setValue({
+      id: offer.id ? offer.id: '',
+      title: offer.title ? offer.title: '',
+      brand: offer.brand ? offer.brand: '',
+      model: offer.model ? offer.model: '',
+      description: offer.description ? offer.description : '',
+      price: offer.price ? offer.price: ''
+    });
   }
+
+  onDeleteOffer(offerId? : string): void {
+    if(offerId) {
+      this.offersServices.deleteOffer(offerId).catch(console.error);
+    }else {
+      console.error('An ID must be provided to delete an offer');
+    }
+  }
+
+  ngOnDestroy(){
+    this.subscription.unsubscribe();
+  }
+
+
 
 }

@@ -42,14 +42,21 @@
         <h1 class="display-6 text-dark">Créer une annonce</h1>
         <hr class="bg-dark mb-5">
         <form [formGroup]="offerForm" (ngSubmit)="onSubmitOfferForm()">
-          <input type="number" formControlName="index" hidden>
+          <input type="text" formControlName="id" hidden>
           <div class="form-group mb-3">
             <label for="offerTitleInput">Titre</label>
             <input type="text"  id="offerTitleInput" class="form-control" formControlName="title" >
           </div>
+          <div class="px-3" *ngIf="currentPhotoUrl">
+            <img [src]="currentPhotoUrl" class="w-100 rounded">
+          </div>
+          <div class="mb-3">
+            <label for="offerPhotoInput" class="form-label">Choisissez le fichier</label>
+            <input type="file"  id="offerPhotoInput" class="form-control" formControlName="photo" (change)="onChangeOfferPhoto($event)">
+          </div>
           <div class="form-group mb-3">
             <label for="offerBrandInput">Marque</label>
-            <input type="text"  id="offerBrandInput" class="form-control" formControlName="brand" >
+            <input type="text"  id="offerBrandInput" class="form-control" formControlName="brand" appUppercaseInput >
           </div>
           <div class="form-group mb-3">
             <label for="offerModelInput">Modèle</label>
@@ -80,6 +87,7 @@
           <thead>
             <tr>
               <th scope="col">#</th>
+              <th scope="col">Photo</th>
               <th scope="col">Titre</th>
               <th scope="col">Marque</th>
               <th scope="col">Modèle</th>
@@ -90,13 +98,16 @@
           <tbody>
             <tr *ngFor="let item of offers; let i = index">
               <th scope="row"> {{ i }} </th>
-              <td> {{item.title}} </td>
-              <td> {{item.brand}} </td>
+              <th>
+                <img *ngIf="item.photo" [src] = "item.photo | safeUrl" width="90">
+              </th>
+              <td> {{item.title | firstCharUppercase}} </td>
+              <td> {{item.brand }} </td>
               <td> {{item.model}} </td>
-              <td> {{item.price}} </td>
+              <td> {{item.price | currency:'EUR':'symbol':'4.2-2':'FR' }} </td>
               <td>
-                <button class="btn btn-primary" (click)="onEditOffer(item, i)">Modifier</button>
-                <button class="btn btn-danger" type="button" (click)="onDeleteOffer(i)">Supprimer</button>
+                <button class="btn btn-primary" (click)="onEditOffer(item)">Modifier</button>
+                <button class="btn btn-danger" type="button" (click)="onDeleteOffer(item.id)">Supprimer</button>
               </td>
             </tr>
           </tbody>

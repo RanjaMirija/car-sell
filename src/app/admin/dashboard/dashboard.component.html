@@ -99,7 +99,7 @@
             <tr *ngFor="let item of offers; let i = index">
               <th scope="row"> {{ i }} </th>
               <th>
-                <img *ngIf="item.photo" [src] = "item.photo | safeUrl" width="90">
+                <img *ngIf="item.photo" [src] = "item.photo | safeUrl" width="20%">
               </th>
               <td> {{item.title | firstCharUppercase}} </td>
               <td> {{item.brand }} </td>

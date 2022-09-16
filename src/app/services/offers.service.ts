@@ -83,5 +83,16 @@ export class OffersService {
     });
   }
 
+  private removePhoto(photoUrl: string): Promise<any> {
+    return new Promise((resolve, reject) => {
+      this.storage.refFromURL(photoUrl).delete().subscribe({
+        complete: () => resolve({}),
+        error: reject
+      });
+    });
+  }
+
+
+
 
 }

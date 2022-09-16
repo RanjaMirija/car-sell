@@ -47,7 +47,7 @@
             <label for="offerTitleInput">Titre</label>
             <input type="text"  id="offerTitleInput" class="form-control" formControlName="title" >
           </div>
-          <div class="px-3" *ngIf="currentPhotoUrl">
+          <div class="px-3" *ngIf="currentPhotoUrl && currentPhotoUrl !== ''">
             <img [src]="currentPhotoUrl" class="w-100 rounded">
           </div>
           <div class="mb-3">

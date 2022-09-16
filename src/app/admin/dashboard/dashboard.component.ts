@@ -51,13 +51,15 @@ export class DashboardComponent implements OnInit, OnDestroy {
   onSubmitOfferForm(): void {
     const offerId = this.offerForm.value.id;
     let offer = this.offerForm.value;
+    const offerPhotoUrl = this.offers.find(el => el.id === offerId)?.photo;
+    offer = {...offer, photo: offerPhotoUrl};
     if (!offerId || offerId && offerId === '' ) { //Création
-      delete offer.index;
+      delete offer.id;
       this.offersServices.createOffer(offer, this.currentOfferPhotoFile)
      .catch(console.error)
     } else { // Modification
       delete offer.id;
-      this.offersServices.editOffer(offer, offerId)
+      this.offersServices.editOffer(offer, offerId, this.currentOfferPhotoFile)
       .catch(console.error);
     }
     this.offerForm.reset();
@@ -76,9 +78,11 @@ export class DashboardComponent implements OnInit, OnDestroy {
   }
 
   onEditOffer(offer: Offer): void{
+    this.currentPhotoUrl = offer.photo ? offer.photo: '';
     this.offerForm.setValue({
       id: offer.id ? offer.id: '',
       title: offer.title ? offer.title: '',
+      photo: '',
       brand: offer.brand ? offer.brand: '',
       model: offer.model ? offer.model: '',
       description: offer.description ? offer.description : '',

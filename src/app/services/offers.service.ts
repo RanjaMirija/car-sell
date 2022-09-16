@@ -43,34 +43,43 @@ export class OffersService {
     } catch (error) {
       throw error;
     }
-
-
-
   }
 
-  editOffer(offer : Offer, offerId: string): Promise<Offer> {
-    return new Promise((resolve, reject) => {
-      this.db.list('offers').update(offerId, offer)
-      .then((res) => {
-        const updateOffer = {...offer, id: offerId};
-        const offerToUpdateIndex = this.offers.findIndex(el => el.id === offerId);
-        this.offers[offerToUpdateIndex] = updateOffer;
-        this.dispatchOffers();
-        resolve({...offer, id: offerId})
-      }).catch(reject);
-    });
+  async editOffer(offer : Offer, offerId: string, newOfferPhoto?: any): Promise<Offer> {
+    try {
+      if(newOfferPhoto && offer.photo && offer.photo !== '') {
+        await this.removePhoto(offer.photo);
+      }
+      if(newOfferPhoto) {
+        const newPhotoUrl = await this.uploadPhoto(newOfferPhoto);
+        offer.photo = newPhotoUrl;
+      }
+      await this.db.list('offers').update(offerId, offer);
+      const offerIndexToUpdate = this.offers.findIndex(el => el.id === offerId);
+      this.offers[offerIndexToUpdate] = {...offer, id: offerId};
+      this.dispatchOffers();
+      return {...offer, id: offerId};
+    } catch (error) {
+      throw error;
+    }
   }
 
-  deleteOffer(offerId : string): Promise<Offer> {
-    return new Promise((resolve, reject) => {
-      this.db.list('offers').remove(offerId)
-      .then(() => {
-        const offerToDeleteIndex = this.offers.findIndex(el => el.id === offerId);
-        this.offers.splice(offerToDeleteIndex,1);
-        this.dispatchOffers();
+  async deleteOffer(offerId : string): Promise<Offer> {
 
-      }).catch(console.error)
-    });
+    try {
+      const offerToDeleteIndex = this.offers.findIndex(el => el.id === offerId);
+      const offerToDelete = this.offers[offerToDeleteIndex];
+      if(offerToDelete.photo && offerToDelete.photo !== '') {
+        await this.removePhoto(offerToDelete.photo)
+      }
+      await this.db.list('offers').remove(offerId);
+      this.offers.splice(offerToDeleteIndex,1);
+      this.dispatchOffers();
+      return offerToDelete;
+
+    } catch (error) {
+      throw error;
+    }
   }
 
 
@@ -80,6 +89,16 @@ export class OffersService {
       upload.then((res) => {
         resolve(res.ref.getDownloadURL())
       }).catch(reject);
+    });
+  }
+
+  private removePhoto(photoURL: string) : Promise<any> {
+    return new Promise((resolve, reject) => {
+      this.storage.refFromURL(photoURL).delete().subscribe({
+        complete : () => resolve({}),
+        error : reject
+
+    })
     });
   }
 

@@ -36,10 +36,20 @@ export class AuthService {
 
   signoutUser(): Promise<void> {
     return new Promise((resolve, reject) => {
-      this.auth.signOut()
-      .then(resolve)
-      .catch(reject)
+      this.auth.signOut().then(()=>{
+        this.currentUserSubject.next(null);
+        resolve();
+      }).catch(reject)
     })
+  }
+
+  sendPasswordResetEmail(email:string): Promise<void> {
+    return new Promise((resolve, reject) => {
+      this.auth.sendPasswordResetEmail(email)
+      .then(()=>{
+        resolve()
+      }).catch(reject)
+    });
   }
 
 }

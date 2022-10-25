@@ -13,8 +13,9 @@
             <label for="signinPassword">Mot de passe</label>
             <input type="password" class="form-control" id="signinPassword" placeholder="Au moins 8 caractères" formControlName="password">
           </div>
-          <div class="d-flex">
-            <button class="btn btn-primary mx-auto" type="submit" [disabled]="signinForm.invalid">Connecter</button>
+          <div class="d-flex flex-column">
+            <button class="btn btn-primary mx-auto mb-3" type="submit" [disabled]="signinForm.invalid">Connexion</button>
+            <a class="mx-auto" [routerLink]="['/auth','forgot-password']">Mot de passe oublié</a>
           </div>
         </form>
       </div>

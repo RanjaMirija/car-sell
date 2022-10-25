@@ -1,3 +1,4 @@
+import { Router } from '@angular/router';
 import { AuthService } from 'src/app/services/auth.service';
 import { User } from './../interfaces/user';
 import { Subscription } from 'rxjs';
@@ -16,7 +17,8 @@ export class HeaderComponent implements OnInit, OnDestroy {
   title = 'CarSell';
 
   constructor(
-    private authService: AuthService
+    private authService: AuthService,
+    private router: Router
   ) { }
 
   ngOnInit(): void {
@@ -28,6 +30,13 @@ export class HeaderComponent implements OnInit, OnDestroy {
 
   getTitle(): string {
     return this.title;
+  }
+
+  onSignout(): void {
+    this.authService.signoutUser()
+    .then(()=>{
+      this.router.navigate(['/home']);
+    }).catch(console.error)
   }
 
   ngOnDestroy(): void {

@@ -1,6 +1,6 @@
-<nav class="navbar navbar-expand-lg bg-dark shadow">
-  <div class="container text-white">
-    <a class="navbar-brand text-white" href="#">{{ getTitle() }}</a>
+<nav class="navbar navbar-expand-lg shadow">
+  <div class="container">
+    <a class="navbar-brand display-1" href="#">{{ getTitle() }}</a>
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
@@ -9,8 +9,25 @@
         <li class="nav-item">
           <a class="nav-link" [routerLink]="['/home']">Accueil</a>
         </li>
-        <li class="nav-item">
-          <a class="nav-link " [routerLink]="['/admin','dashboard']">Tableau de Bord</a>
+        <li class="nav-item" *ngIf="!currentUser">
+          <a class="nav-link " [routerLink]="['/auth','signin']">Connexion</a>
+        </li>
+        <li class="nav-item" *ngIf="!currentUser">
+          <a class="nav-link " [routerLink]="['/auth','signup']">Inscription</a>
+        </li>
+        <li class="nav-item dropdown" *ngIf="currentUser">
+          <a class="nav-link dropdown-toggle"  id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            Admin
+          </a>
+          <ul class="dropdown-menu" aria-labelledby="navbar-dropdown">
+            <li>
+              <a class="dropdown-item " [routerLink]="['/admin','dashboard']">Tableau de Bord</a>
+            </li>
+            <li><hr class="dropdown-divider"></li>
+            <li>
+              <a class="dropdown-item text-danger">Déconnexion</a>
+            </li>
+          </ul>
         </li>
       </ul>
     </div>

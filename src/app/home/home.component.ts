@@ -16,7 +16,7 @@ export class HomeComponent implements OnInit {
   }
 
   onLogin():void {
-    this.router.navigate(['admin','dashboard']);
+    this.router.navigate(['auth','signin']);
   }
 
 }
